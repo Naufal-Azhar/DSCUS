@@ -1,0 +1,696 @@
+{
+  "document": {
+    "name": "DecisionMirror Project Specification",
+    "version": "1.0.0",
+    "status": "implementation_baseline",
+    "based_on": "Reviews 1-10",
+    "last_updated": "2026-11-14",
+    "notice": "Planning baseline only; does not claim implementation or validation is complete."
+  },
+  "project": {
+    "name": "DecisionMirror",
+    "tagline": "Think Before You Commit.",
+    "category": "Frankenstein",
+    "positioning": "Decision Stress Testing Platform",
+    "primary_audience": "Students and university students",
+    "primary_demo_scenario": "Deciding whether to accept an internship opportunity in another city",
+    "promise": "Turn a personal decision into an editable reasoning model, challenge its assumptions, and see how changes affect the reasoning behind it.",
+    "principle": "Help users think better; do not decide for them."
+  },
+  "goals": [
+    "Decompose natural-language decisions into editable reasoning elements.",
+    "Expose claims, assumptions, evidence, unknowns, counterarguments, alternatives, and consequences.",
+    "Allow users to correct AI-proposed content.",
+    "Evaluate claims through deterministic rules.",
+    "Stress-test assumptions against an immutable baseline.",
+    "Trace changes through dependencies and consequences.",
+    "Preserve provenance and explain status changes."
+  ],
+  "non_goals": [
+    "Choosing a best decision or predicting future outcomes.",
+    "Treating system statuses as objective truth.",
+    "Replacing professional medical, legal, or financial advice.",
+    "Medical diagnosis/treatment, legal strategy, investment/trading, emergencies, or direct physical-safety decisions.",
+    "Bayesian probability estimates, unrestricted evidence retrieval, collaboration, or multi-criteria weighting in MVP."
+  ],
+  "users_and_use_cases": {
+    "primary": "Students and university students",
+    "secondary": [
+      "Freelancers and early-career professionals",
+      "Small founders and independent professionals"
+    ],
+    "initial_use_cases": [
+      "Accept internship in another city",
+      "Change university major",
+      "Buy an expensive laptop for study or freelance work"
+    ]
+  },
+  "workflow": [
+    {
+      "step": 1,
+      "name": "Decision Input",
+      "description": "User enters decision title, context, and optional alternatives."
+    },
+    {
+      "step": 2,
+      "name": "Decomposition Review",
+      "description": "LLM proposes typed elements; user can accept, edit, reject, add, or delete."
+    },
+    {
+      "step": 3,
+      "name": "Challenge Center",
+      "description": "LLM proposes counterarguments; user reviews each proposal."
+    },
+    {
+      "step": 4,
+      "name": "Scenario Lab",
+      "description": "User changes assumption states to HOLDS or FAILS in a scenario derived from immutable baseline."
+    },
+    {
+      "step": 5,
+      "name": "Reasoning Map",
+      "description": "Displays nodes, relationships, statuses, provenance, and paths."
+    },
+    {
+      "step": 6,
+      "name": "Decision Report",
+      "description": "Traceable summary, supporting arguments, counterarguments, assumptions, evidence gaps, scenario comparison, questions, and next actions."
+    }
+  ],
+  "features": [
+    {
+      "id": "F01",
+      "name": "Decision Input",
+      "priority": "P0"
+    },
+    {
+      "id": "F02",
+      "name": "AI Decomposition and User Correction",
+      "priority": "P0"
+    },
+    {
+      "id": "F03",
+      "name": "Advocate/Skeptic/Neutral Analysis",
+      "priority": "P0",
+      "note": "Perspectives are not independent evidence."
+    },
+    {
+      "id": "F04",
+      "name": "Assumption Stress Test",
+      "priority": "P0"
+    },
+    {
+      "id": "F05",
+      "name": "Typed Decision Graph",
+      "priority": "P0",
+      "note": "Soft cap around 40 nodes for MVP."
+    },
+    {
+      "id": "F06",
+      "name": "Evidence Traceability",
+      "priority": "P0"
+    },
+    {
+      "id": "F07",
+      "name": "Decision Report with Markdown Export",
+      "priority": "P0"
+    },
+    {
+      "id": "F08",
+      "name": "English and Indonesian UI/input",
+      "priority": "P0"
+    },
+    {
+      "id": "F09",
+      "name": "Safety, privacy, and deletion",
+      "priority": "P0"
+    },
+    {
+      "id": "F10",
+      "name": "Fixture Demo Mode",
+      "priority": "P0"
+    },
+    {
+      "id": "F11",
+      "name": "PDF Export",
+      "priority": "P2",
+      "note": "Deferred."
+    },
+    {
+      "id": "F12",
+      "name": "Collaborative Review",
+      "priority": "POST_MVP"
+    }
+  ],
+  "domain_model": {
+    "node_types": [
+      "DECISION",
+      "ALTERNATIVE",
+      "CLAIM",
+      "ASSUMPTION",
+      "EVIDENCE",
+      "UNKNOWN",
+      "COUNTERARGUMENT",
+      "CONSEQUENCE"
+    ],
+    "edge_types": [
+      {
+        "type": "SUPPORTS",
+        "direction": "source_to_target",
+        "meaning": "Evidence or argument supports a claim."
+      },
+      {
+        "type": "ATTACKS",
+        "direction": "counterargument_to_counterargument",
+        "meaning": "Attack relation evaluated by argumentation engine."
+      },
+      {
+        "type": "CHALLENGES",
+        "direction": "counterargument_to_claim",
+        "meaning": "Effective counterargument challenges a claim."
+      },
+      {
+        "type": "DEPENDS_ON",
+        "direction": "claim_to_prerequisite",
+        "meaning": "Claim depends on assumption or another claim."
+      },
+      {
+        "type": "ADDRESSES",
+        "direction": "unknown_to_claim_or_decision",
+        "meaning": "Information gap relevant to target; no status propagation in MVP."
+      },
+      {
+        "type": "LEADS_TO",
+        "direction": "claim_or_alternative_to_consequence",
+        "meaning": "Used for consequence tracing, not direct claim-status assignment."
+      }
+    ],
+    "provenance_origins": [
+      "USER_PROVIDED",
+      "EXTERNAL_SOURCE",
+      "SYSTEM_INFERENCE",
+      "UNVERIFIED_ASSUMPTION",
+      "UNKNOWN_INFORMATION"
+    ],
+    "actor_types": [
+      "USER",
+      "LLM",
+      "SYSTEM"
+    ],
+    "assumption_states": [
+      "UNVERIFIED",
+      "HOLDS",
+      "FAILS"
+    ],
+    "counterargument_review_states": [
+      "PROPOSED",
+      "USER_ACCEPTED",
+      "DISMISSED"
+    ],
+    "grounded_labels": [
+      "IN",
+      "OUT",
+      "UNDECIDED"
+    ],
+    "claim_statuses": [
+      "SUPPORTED",
+      "CONDITIONAL",
+      "CHALLENGED",
+      "UNSUPPORTED"
+    ],
+    "claim_status_precedence": [
+      "UNSUPPORTED",
+      "CHALLENGED",
+      "CONDITIONAL",
+      "SUPPORTED"
+    ],
+    "consequence_impact_statuses": [
+      "NO_DETECTED_CHANGE",
+      "CONDITIONALLY_AT_RISK",
+      "CHALLENGED",
+      "AT_RISK"
+    ]
+  },
+  "reasoning_rules": [
+    {
+      "id": "R1",
+      "rule": "A claim depending on an assumption in FAILS state becomes UNSUPPORTED."
+    },
+    {
+      "id": "R2",
+      "rule": "A claim depending on an UNSUPPORTED claim becomes UNSUPPORTED; depending on CHALLENGED or CONDITIONAL makes it at most CONDITIONAL."
+    },
+    {
+      "id": "R3",
+      "rule": "Grounded labelling applies to the accepted counterargument graph, not all nodes. An IN counterargument connected by CHALLENGES challenges its claim."
+    },
+    {
+      "id": "R4",
+      "rule": "A claim depending on an UNVERIFIED assumption, or lacking at least one supporting evidence item from USER_PROVIDED or EXTERNAL_SOURCE, is at most CONDITIONAL."
+    },
+    {
+      "id": "R5",
+      "rule": "Otherwise a claim may be SUPPORTED, subject to higher-priority rules."
+    },
+    {
+      "id": "R6",
+      "rule": "SYSTEM_INFERENCE evidence must never independently upgrade a claim to SUPPORTED."
+    },
+    {
+      "id": "R7",
+      "rule": "A claim attacked by a PROPOSED counterargument gets challenged_by_unverified_counterargument flag; proposal does not change status."
+    }
+  ],
+  "evaluation_semantics": {
+    "argumentation": {
+      "IN": "All attackers are OUT, or there are no attackers.",
+      "OUT": "At least one attacker is IN.",
+      "UNDECIDED": "Neither IN nor OUT condition holds.",
+      "notes": "Only USER_ACCEPTED counterarguments are eligible. Review state is distinct from grounded label."
+    },
+    "dependency_direction": "Store dependent claim -> prerequisite; use reverse dependency index to find dependents.",
+    "propagation": {
+      "SUPPORTS": "Changes to supporting evidence/argument trigger target claim reevaluation.",
+      "DEPENDS_ON": "Propagate through reverse dependencies in deterministic topological order.",
+      "ATTACKS": "Triggers argumentation reevaluation, not ordinary dependency propagation.",
+      "CHALLENGES": "Review/label changes trigger target claim reevaluation.",
+      "LEADS_TO": "Trace consequences; do not directly set claim status.",
+      "ADDRESSES": "No claim-status propagation semantics in MVP."
+    },
+    "scenario_pipeline": [
+      "Load immutable baseline version",
+      "Apply all scenario changes together",
+      "Recompute argumentation labels when needed",
+      "Identify affected claims",
+      "Evaluate affected claims in deterministic topological order with stable ID tie-break",
+      "Trace affected consequences",
+      "Produce status/impact diff and causal paths"
+    ],
+    "baseline": "Every scenario references one immutable baseline version. Editing baseline creates a new version and marks scenarios on old version stale.",
+    "cycles": {
+      "DEPENDS_ON": "Reject at write time",
+      "LEADS_TO": "Reject in MVP unless explicit semantics are designed",
+      "ATTACKS": "Allowed and handled by grounded labelling"
+    },
+    "consequence_mapping": {
+      "unchanged": "NO_DETECTED_CHANGE",
+      "conditional": "CONDITIONALLY_AT_RISK",
+      "challenged": "CHALLENGED",
+      "unsupported": "AT_RISK",
+      "note": "For multiple upstream claims, derive impact from all relevant sources. Never say SAFE."
+    },
+    "status_precedence": "UNSUPPORTED > CHALLENGED > CONDITIONAL > SUPPORTED"
+  },
+  "llm_contract": {
+    "role": "Stateless proposal and language-analysis service",
+    "may": [
+      "Propose decomposition",
+      "Propose counterarguments",
+      "Generate concise explanations and report wording"
+    ],
+    "must_not": [
+      "Write directly to database",
+      "Set final claim statuses",
+      "Modify baseline",
+      "Delete user data",
+      "Execute SQL/shell/arbitrary tools",
+      "Invent or certify evidence provenance",
+      "Return best-decision verdict"
+    ],
+    "controls": [
+      "Structured output",
+      "Pydantic validation",
+      "Validate IDs/types/endpoints",
+      "Bounded retries",
+      "Timeout",
+      "Token and cost limits",
+      "Fixture mode",
+      "Prompt-injection-resistant input separation"
+    ],
+    "evidence_policy": "URL existence, source trustworthiness, and support for a claim are separate properties. MVP has no unrestricted LLM web search."
+  },
+  "architecture": {
+    "style": "Modular monolith",
+    "frontend": [
+      "React",
+      "TypeScript strict",
+      "Vite",
+      "Tailwind CSS",
+      "shadcn/ui",
+      "React Flow",
+      "TanStack Query",
+      "React Hook Form",
+      "Zod",
+      "lightweight i18n"
+    ],
+    "backend": [
+      "Python 3.12+",
+      "FastAPI",
+      "Pydantic v2",
+      "SQLAlchemy 2.x",
+      "Alembic",
+      "Pytest",
+      "Hypothesis",
+      "NetworkX"
+    ],
+    "database": "PostgreSQL",
+    "llm": "External provider adapter selected based on current cost, latency, structured-output reliability, and retention policy.",
+    "infrastructure": [
+      "Docker",
+      "Docker Compose",
+      "Caddy",
+      "GitHub Actions"
+    ],
+    "excluded_from_mvp": [
+      "Kubernetes",
+      "microservices",
+      "Redis cluster",
+      "Kafka",
+      "Neo4j",
+      "pgvector",
+      "local LLM inference"
+    ],
+    "repository_tree": [
+      ".kiro/",
+      "frontend/",
+      "backend/",
+      "infra/",
+      "docs/",
+      "scripts/",
+      ".github/",
+      ".env.example",
+      ".gitignore",
+      "LICENSE",
+      "README.md",
+      "CONTRIBUTING.md"
+    ],
+    "repository_compliance": "Public GitHub repo, open-source license, .kiro at repository root and not ignored. Folder names beyond explicit organizer requirements are engineering recommendations."
+  },
+  "api": [
+    [
+      "POST",
+      "/decisions",
+      "Create decision"
+    ],
+    [
+      "GET",
+      "/decisions/{id}",
+      "Get workspace"
+    ],
+    [
+      "POST",
+      "/decisions/{id}/decompose",
+      "Generate decomposition"
+    ],
+    [
+      "PATCH",
+      "/decisions/{id}/elements/{element_id}",
+      "Edit element"
+    ],
+    [
+      "POST",
+      "/decisions/{id}/elements",
+      "Add element"
+    ],
+    [
+      "DELETE",
+      "/decisions/{id}/elements/{element_id}",
+      "Delete element"
+    ],
+    [
+      "POST",
+      "/decisions/{id}/analyze",
+      "Generate adversarial analysis"
+    ],
+    [
+      "PATCH",
+      "/decisions/{id}/counterarguments/{cid}",
+      "Accept/dismiss counterargument"
+    ],
+    [
+      "POST",
+      "/decisions/{id}/stress-test",
+      "Create/evaluate scenario"
+    ],
+    [
+      "GET",
+      "/decisions/{id}/scenarios",
+      "List scenarios"
+    ],
+    [
+      "GET",
+      "/decisions/{id}/graph",
+      "Get graph"
+    ],
+    [
+      "GET",
+      "/decisions/{id}/report",
+      "Get report"
+    ],
+    [
+      "POST",
+      "/decisions/{id}/feedback",
+      "Submit feedback"
+    ],
+    [
+      "DELETE",
+      "/decisions/{id}",
+      "Delete decision data"
+    ],
+    [
+      "GET",
+      "/health",
+      "Liveness check"
+    ]
+  ],
+  "data_model": {
+    "tables": [
+      "sessions",
+      "decisions",
+      "decision_versions",
+      "nodes",
+      "edges",
+      "scenarios",
+      "scenario_changes",
+      "evaluations",
+      "audit_events"
+    ],
+    "node_fields": [
+      "id",
+      "decision_version_id",
+      "node_type",
+      "title",
+      "content",
+      "origin",
+      "created_by",
+      "updated_by",
+      "assumption_state",
+      "review_state",
+      "grounded_label",
+      "evaluation_status",
+      "impact_status",
+      "metadata",
+      "created_at",
+      "updated_at"
+    ],
+    "edge_fields": [
+      "id",
+      "decision_version_id",
+      "source_node_id",
+      "target_node_id",
+      "edge_type",
+      "created_at"
+    ],
+    "constraints": [
+      "UUID primary keys",
+      "Foreign keys",
+      "Unique decision/version number",
+      "Validate endpoint membership in same version",
+      "Transactions for graph/scenario mutations",
+      "Optimistic concurrency via version/ETag"
+    ],
+    "unresolved": [
+      "Copy nodes/edges per version or immutable snapshots with membership",
+      "Persist evaluation runs or recompute on read",
+      "Exact deletion and backup-retention policy",
+      "Anonymous session expiry duration"
+    ]
+  },
+  "security_privacy": [
+    "Anonymous/private sessions with strict resource isolation",
+    "HttpOnly and Secure production cookies; appropriate SameSite",
+    "CSRF protection for cookie-authenticated state-changing endpoints",
+    "Restrictive CORS allowlist",
+    "Rate-limit LLM endpoints and enforce input size limits",
+    "Do not log decision text, prompts, or sensitive reports",
+    "Keep API keys server-side; do not expose PostgreSQL publicly",
+    "Support and test user data deletion",
+    "Review provider retention/training policies before sending user content",
+    "Pseudonymization is not anonymization"
+  ],
+  "deployment": {
+    "topology": "Single VPS with Docker Compose",
+    "services": [
+      "Frontend static build",
+      "FastAPI API",
+      "PostgreSQL",
+      "Caddy reverse proxy"
+    ],
+    "initial_test_profile": {
+      "cpu": "2 vCPU",
+      "memory": "4 GB RAM",
+      "storage": "40-60 GB SSD"
+    },
+    "profile_note": "Starting point for measurement, not a capacity guarantee.",
+    "reliability": [
+      "Persistent database volume",
+      "Private database network",
+      "Health/readiness checks",
+      "Restart policies",
+      "Automated backup and tested restore",
+      "Fixture fallback",
+      "No false success when database writes fail"
+    ],
+    "performance_budgets": [
+      {
+        "operation": "Workspace load",
+        "target": "P95 < 2 seconds"
+      },
+      {
+        "operation": "Graph evaluation",
+        "target": "P95 < 500 ms"
+      },
+      {
+        "operation": "Stress calculation",
+        "target": "P95 < 500 ms"
+      },
+      {
+        "operation": "Health check",
+        "target": "P95 < 200 ms"
+      },
+      {
+        "operation": "LLM request",
+        "target": "30-45 second timeout"
+      }
+    ],
+    "performance_note": "Targets are proposed budgets, not measured results."
+  },
+  "testing": {
+    "p0": [
+      "Claim status precedence",
+      "Dependency propagation",
+      "Baseline immutability",
+      "Scenario isolation",
+      "Graph validation",
+      "LLM output validation",
+      "Provenance preservation",
+      "Session isolation",
+      "Data deletion"
+    ],
+    "test_suites": [
+      "Claim precedence T01-T12",
+      "Stress scenarios S01-S10",
+      "Graph integrity/provenance",
+      "LLM reliability and prompt injection SEC01-SEC15",
+      "API isolation and rate limiting",
+      "Hypothesis property-based invariants"
+    ],
+    "quality_gates": [
+      "Ruff",
+      "mypy or Pyright",
+      "Pytest",
+      "Hypothesis",
+      "FastAPI TestClient",
+      "Alembic migration checks",
+      "TypeScript strict",
+      "Frontend lint/build",
+      "Docker integration tests"
+    ]
+  },
+  "implementation_milestones": [
+    {
+      "period": "Nov 14-16, 2026",
+      "name": "Foundation",
+      "deliverables": [
+        "Specs and steering",
+        "Monorepo skeleton",
+        "Docker Compose",
+        "PostgreSQL and migrations",
+        "Basic CI"
+      ]
+    },
+    {
+      "period": "Nov 17-21, 2026",
+      "name": "Reasoning Engine",
+      "deliverables": [
+        "Graph validator",
+        "Claim evaluator",
+        "Argumentation evaluator",
+        "Dependency propagation",
+        "Baseline/scenario isolation",
+        "Core tests"
+      ]
+    },
+    {
+      "period": "Nov 22-25, 2026",
+      "name": "AI Integration",
+      "deliverables": [
+        "LLM adapter",
+        "Decomposition",
+        "Adversarial lenses",
+        "Counterargument review",
+        "Structured validation",
+        "Fixture mode"
+      ]
+    },
+    {
+      "period": "Nov 26-29, 2026",
+      "name": "Product Experience",
+      "deliverables": [
+        "Workflow UI",
+        "Reasoning Map",
+        "Scenario Lab",
+        "Report",
+        "Bilingual interface"
+      ]
+    },
+    {
+      "period": "Nov 30-Dec 2, 2026",
+      "name": "Hardening",
+      "deliverables": [
+        "Integration/security tests",
+        "Deployment",
+        "5-10 student pilot",
+        "UX fixes"
+      ]
+    },
+    {
+      "period": "Dec 3-4, 2026",
+      "name": "Submission Freeze",
+      "deliverables": [
+        "Demo video",
+        "README/Kiro write-up",
+        "Repository audit",
+        "Devpost submission"
+      ]
+    }
+  ],
+  "submission_checks": [
+    "Public GitHub repository",
+    "Open-source license",
+    "Root .kiro not ignored",
+    "Functional app URL",
+    "Public YouTube demo under 3 minutes",
+    "Kiro usage write-up",
+    "Project originality/prior-work disclosure",
+    "App accessible during judging",
+    "Recheck deadline, timezone, judging period, prizes, and eligibility on live organizer rules"
+  ],
+  "open_decisions": [
+    "Choose LLM provider based on current price, latency, structured output, and retention terms",
+    "Finalize SQL versioning strategy",
+    "Define session expiry and backup retention",
+    "Recheck live Kiroween rules",
+    "Confirm installed Kiro version's exact spec/steering/hook/agent formats"
+  ]
+}
